@@ -37,13 +37,25 @@
     <div class="vin">
       <van-cell-group>
         <van-field  v-model="vinMessage" rows="1" autosize label="车架号" type="textarea" placeholder="请输入车架号后六位" style="padding-left: 28.5px"/>
-        <img src="./img/question_icon.png" alt="">
+        <img src="./img/question_icon.png" alt="" @click="showImgVin = !showImgVin" class="vinImg">
+        <van-popup v-model="showImgVin">
+          <div class="mask" style="background-color: #fff;text-align: center;width:8.3rem;height:6.3rem;">
+            <img src="./img/v1.png" alt="" style=" width: 7.46rem;height: 5.3rem;margin: .267rem auto 0 auto;">
+            <p @click="showImgVin = false" style="height:.3467rem;font-size:.373rem;font-weight:400;color:rgba(39,130,244,1);line-height: .48rem;display:block">我知道了</p>
+          </div>
+        </van-popup>
       </van-cell-group>
     </div>
     <div class="engine">
       <van-cell-group>
         <van-field  v-model="engineMessage" rows="1" autosize label="发动机号" type="textarea" placeholder="请选择发动机号后6位" style="padding-left: 28.5px;"></van-field>
-        <img src="./img/question_icon.png" alt="">
+        <img src="./img/question_icon.png" alt="" @click="showImgEng = !showImgEng" class="engineImg">
+        <van-popup v-model="showImgEng">
+          <div class="mask" style="background-color: #fff;text-align: center;width:8.3rem;height:6.3rem;">
+            <img src="./img/v2.png" alt="" style=" width: 7.46rem;height: 5.3rem;margin: .267rem auto 0 auto;">
+            <p @click="showImgEng = false" style="height:.3467rem;font-size:.373rem;font-weight:400;color:rgba(39,130,244,1);line-height: .48rem;display:block">我知道了</p>
+          </div>
+        </van-popup>
       </van-cell-group>
     </div>
     <van-cell is-link style="height: 1.3rem">
@@ -99,6 +111,8 @@ export default {
       asv_vehicle_plate_number: '', // 车牌号
       result:{},
       res:{},
+      showImgEng: false,
+      showImgVin: false,
       // 车牌键盘
       showKeyboard: true,    //车牌号输入框是否聚焦
       show_chinese:false,     //是否显示汉字键盘
@@ -505,7 +519,7 @@ export default {
     //   line-height 80px
     //   text-align left
     .engine
-      img 
+      .engineImg 
         position absolute
         width:24px;
         height:24px;
@@ -513,7 +527,7 @@ export default {
         left: 92%;
         top: 26px;
     .vin 
-      img 
+      .vinImg 
         position absolute
         width:24px;
         height:24px;

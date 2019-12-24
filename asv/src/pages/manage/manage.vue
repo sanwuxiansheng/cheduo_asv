@@ -384,7 +384,7 @@ export default {
       this.timeValue = timeValue;
     }
     let code = this.getCookie('region_code');
-    if (coed) {
+    if (code) {
       this.region_code = code;
     }
   },
