@@ -227,4 +227,14 @@ textarea{
 .van-step--finish .van-step__circle, .van-step--finish .van-step__line {
     background-color: #2782f4;
 }
+/* 自定义键盘样式 */
+.van-button--small {
+  min-width: 40px;
+  height: 80px;
+  /* padding: 0 8px; */
+  font-size: 24px;
+  line-height: 60px;
+  margin: .14rem 1%;
+  border-radius: .15rem;
+}
 </style>

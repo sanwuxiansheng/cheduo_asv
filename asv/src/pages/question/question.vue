@@ -10,7 +10,7 @@
         </div>
         <img src="./img/answer_icon.png" alt="">
         <div class="down">
-          <p> 1、6座以下(不含6座)。</p>
+          <p> 1、7座及以下普通小型车辆。</p>
           <p>2、私家车、公司非营运小车。</p>
           <p>3、车辆需购买交强险。</p>
           <p>4、车辆没有违章情况。</p>
@@ -24,17 +24,8 @@
         </div>
         <img src="./img/answer_icon.png" alt="">
         <div class="down">
-          <p>年检车辆需是6年内5座以下(包含5座)非运营个人蓝牌小轿车。(车辆使用已达到或超过6年的需要车辆到现场进行检测)。 </p>
-        </div>
-      </li>
-      <li>
-        <img src="./img/question_icon.png" alt="">
-        <div class="up">
-          <p>超过6年的车能否代办年检？</p>
-        </div>
-        <img src="./img/answer_icon.png" alt="">
-        <div class="down">
-          <p>很抱歉，超过6年的车辆需到场检测通过后，才能正常年检的，我司暂未开通此项服务。</p>
+          <p> 1、6座及以下小车可正常办理所需年检。</p>
+          <p> 2、7座小车只可办理上线检测办理。</p>
         </div>
       </li>
       <li>
@@ -64,7 +55,8 @@
         </div>
         <img src="./img/answer_icon.png" alt="">
         <div class="down">
-          <p>行驶证正本正面；行驶证副本正面；保单交强险正本或副本，在确认订单处上传照片。</p>
+          <p>1、6年内免上线年检需提供：行驶证正本正面， 行驶证副本正面，保单交强险正本或副本；在确 认订单处上传照片。</p>
+          <p>2、上线年检需提</p>
         </div>
       </li>
       <li>
@@ -84,17 +76,8 @@
         </div>
         <img src="./img/answer_icon.png" alt="">
         <div class="down">
-          <p>代办周期一般为1-2个工作日，不含来回快递时间，具体办理周期以快递时限为准。</p>
-        </div>
-      </li>
-      <li>
-        <img src="./img/question_icon.png" alt="">
-        <div class="up">
-          <p>能否加急处理年检？</p>
-        </div>
-        <img src="./img/answer_icon.png" alt="">
-        <div class="down">
-          <p>年检办理一般是1-2个工作日即可处理好，因中间涉及到快递来回时间，故无法加急。</p>
+          <p>1、6年内免上线年检代办周期一般为1-2个工作 日，不含来回快递时间，具体办理周期以快递时 限为准。</p>
+          <p>2、上线年检代办周期为当天，预约成功后，师 傅按时上门取车到年检站办理年检，完成后返回 交接车辆及资料。</p>
         </div>
       </li>
       <li>
@@ -124,7 +107,7 @@
         </div>
         <img src="./img/answer_icon.png" alt="">
         <div class="down">
-          <p>您可以输入需要年检的车牌，系统会提示您该车 辆能否代办；由于每个地区年检规则不同，大部 分的逾期也可代办。</p>
+          <p>您可以输入需要年检的车牌，系统会提示您该车辆能否代办；由于每个地区年检规则不同，大部分的逾期也可代办。</p>
         </div>
       </li>
       <li>
@@ -135,36 +118,6 @@
         <img src="./img/answer_icon.png" alt="">
         <div class="down">
           <p>不同的地区代办费有所差异，您可以输入需代办 的年检车牌，下单时系统会提示具体的年检费用。</p>
-        </div>
-      </li>
-      <li>
-        <img src="./img/question_icon.png" alt="">
-        <div class="up">
-          <p>车辆年检代办流程？</p>
-        </div>
-        <img src="./img/answer_icon.png" alt="">
-        <div class="down">
-          <p>按照系统提示填写车牌信息、收件地址、提交办 理资料后确认下单完成支付，客服收到材料后开 始办理年检。</p>
-        </div>
-      </li>
-      <li>
-        <img src="./img/question_icon.png" alt="">
-        <div class="up">
-          <p>年检后能否提供回执？</p>
-        </div>
-        <img src="./img/answer_icon.png" alt="">
-        <div class="down">
-          <p>年检成功后，会将年检标志安全寄给您。</p>
-        </div>
-      </li>
-      <li>
-        <img src="./img/question_icon.png" alt="">
-        <div class="up">
-          <p>年检完成后收到哪些资料？</p>
-        </div>
-        <img src="./img/answer_icon.png" alt="">
-        <div class="down">
-          <p>年审订单办理完成后,回寄年审合格标志。</p>
         </div>
       </li>
     </ul>
@@ -238,7 +191,7 @@ export default {
           font-size:28px;
           font-weight:bold;
           color:rgba(69,73,72,1);
-          line-height:70px;
+          line-height:50px;
       .down
         padding-left 50px
         padding-top 15px
@@ -247,5 +200,5 @@ export default {
           font-size:28px;
           font-weight:500;
           color:rgba(167,171,170,1);
-          line-height:42px;
+          line-height:30px;
 </style>

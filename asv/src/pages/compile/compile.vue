@@ -3,18 +3,33 @@
   <Header :title="'年检代办'"></Header>
   <p>完善车辆信息，车多会为您的爱车智能分析年检类型和到期时间</p>
   <div class="compile">
-    <van-cell is-link style="padding-left: 30px;height: 1.3rem">车牌号码<span @click="showCarPlate" class="plate">{{this.value1}}</span><input type="text" maxlength="6" v-model="asv_vehicle_plate_number"></van-cell>
-    <van-popup v-model="isShowCarPlate" position="bottom" :style="{ height: '40%' }">
-      <van-picker show-toolbar :columns="columns3" @cancel="onCancel1" @confirm="onConfirm1"/>
+    <van-cell is-link style="padding-left: 30px;min-height: 1.8rem" @click="clickShowKeyboard">车牌号码<span class="plate">{{this.first}}</span><input type="text" maxlength="6" v-model="numArr.join('')" readonly="readonly" @click="show_allBoard = true;"></van-cell>
+    <van-popup v-model="show_chinese" position="bottom" :overlay="true" overlay-class="displayNone">
+      <div class="plate_chinese_box" style="background-color: #ccc;">
+        <!-- 点击对应的汉字，进行输入 -->
+        <van-button size="small" v-for="(item, index) in ChineseList" :key="item.id" @click="checkChinese(index)">{{item.name}}</van-button>
+        <van-button @click="deleteChinese()" style="height: 1rem;line-height: 1rem">ABC</van-button>
+        <van-button class="close-box" @click.stop="close_keyboard">完成</van-button>
+      </div>
     </van-popup>
+    <div class="allBoard">
+      <van-popup v-model="show_allBoard" position="bottom" :overlay="true" overlay-class="displayNone" >
+        <div class="plate_number_box" style="background-color: #ccc;">
+          <!-- 点击对应的字母或数字，进行输入 -->
+          <van-button size="small" v-for="(item, index) in English_Number" :key="item.id" @click="checkEnglish_num(index)">{{item.name}}</van-button>
+          <van-button @click="onDelete()"  style="height: 1rem;line-height: 1rem"><img src="./img/kb_del.png" alt="" style="width: .5rem;height: .4rem;"></van-button>
+          <van-button class="close-box" @click.stop="close_keyboard">完成</van-button>
+        </div>
+      </van-popup>
+    </div>
     <van-cell is-link style="height: 1.3rem">
-      <van-field style="line-height: .36rem;padding: 8px 12px;border:none;"  v-model="value2" rows="1" autosize label="车辆类型" type="textarea" placeholder="请选择车辆所有人" @click="showCar" readonly="readonly"/>
+      <van-field style="line-height: .46rem;padding: 8px 12px;border:none;"  v-model="value2" rows="1" autosize label="车辆类型" type="textarea" placeholder="请选择车辆所有人" @click="showCar" readonly="readonly"/>
       <van-popup v-model="isShowCar" position="bottom" :style="{ height: '40%' }">
         <van-picker show-toolbar title="请选择车辆类型" :columns="columns1" @cancel="onCancel2" @confirm="onConfirm2"/>
       </van-popup>
     </van-cell>
     <van-cell is-link style="height: 1.3rem">
-      <van-field style="line-height: .36rem;padding: 8px 16px;border:none;" v-model="value3" rows="1" autosize label="车辆座位数" type="textarea" placeholder="请选择车辆座位数"  @click="showCarNub" :style="{paddingLeft: '12px'}" readonly="readonly"/>
+      <van-field style="line-height: .46rem;padding: 8px 16px;border:none;" v-model="value3" rows="1" autosize label="车辆座位数" type="textarea" placeholder="请选择车辆座位数"  @click="showCarNub" :style="{paddingLeft: '12px'}" readonly="readonly"/>
       <van-popup v-model="isShowCarNub" position="bottom" :style="{ height: '40%' }">
         <van-picker show-toolbar title="请选择车辆座位数" :columns="columns2" @cancel="onCancel3" @confirm="onConfirm3"/>
       </van-popup>
@@ -74,7 +89,6 @@ export default {
       checked: false, // 是否是事故车
       columns1: ['公司车', '私家车'],
       columns2: ['2座', '5座', '6座'],
-      columns3: ['京', '津', '冀', '黑', '鲁', '赣', '粤', '渝', '鄂', '湘', '新', '藏', '晋', '辽', '蒙', '吉', '沪', '苏', '浙', '皖', '闽', '豫', '桂', '琼', '川', '贵', '云', '陕', '甘', '青', '宁', '港', '澳'],
       currentDate: new Date(),
       minDate: new Date(2000, 1, 1),
       isShowDay: false,
@@ -85,9 +99,134 @@ export default {
       asv_vehicle_plate_number: '', // 车牌号
       result:{},
       res:{},
+      // 车牌键盘
+      showKeyboard: true,    //车牌号输入框是否聚焦
+      show_chinese:false,     //是否显示汉字键盘
+      show_allBoard:false,     //是否显示英文数字键盘
+      ChineseList:[
+        {name:'京',id:1},
+        {name:'津',id:2},
+        {name:'冀',id:3},
+        {name:'晋',id:4},
+        {name:'蒙',id:5},
+        {name:'辽',id:6},
+        {name:'吉',id:7},
+        {name:'黑',id:8},
+        {name:'沪',id:9},
+        {name:'苏',id:10},
+        {name:'浙',id:11},
+        {name:'皖',id:12},
+        {name:'闽',id:13},
+        {name:'赣',id:14},
+        {name:'鲁',id:15},
+        {name:'豫',id:16},
+        {name:'鄂',id:17},
+        {name:'湘',id:18},
+        {name:'粤',id:19},
+        {name:'桂',id:20},
+        {name:'琼',id:21},
+        {name:'渝',id:22},
+        {name:'川',id:23},
+        {name:'贵',id:24},
+        {name:'云',id:25},
+        {name:'藏',id:26},
+        {name:'陕',id:27},
+        {name:'甘',id:28},
+        {name:'青',id:29},
+        {name:'宁',id:30},
+        {name:'新',id:31},
+        // {name:'←',id:99},
+      ],
+      English_Number:[
+        {name:'1',id:28},
+        {name:'2',id:29},
+        {name:'3',id:30},
+        {name:'4',id:31},
+        {name:'5',id:32},
+        {name:'6',id:33},
+        {name:'7',id:34},
+        {name:'8',id:35},
+        {name:'9',id:36},
+        {name:'0',id:37},
+        {name:'Q',id:38},
+        {name:'W',id:39},
+        {name:'E',id:40},
+        {name:'R',id:41},
+        {name:'T',id:42},
+        {name:'Y',id:43},
+        {name:'U',id:44},
+        {name:'I',id:45},
+        {name:'O',id:46},
+        {name:'P',id:47},
+        {name:'A',id:48},
+        {name:'S',id:49},
+        {name:'D',id:50},
+        {name:'F',id:51},
+        {name:'G',id:52},
+        {name:'H',id:53},
+        {name:'J',id:54},
+        {name:'K',id:55},
+        {name:'L',id:56},
+        {name:'Z',id:57},
+        {name:'X',id:58},
+        {name:'C',id:59},
+        {name:'V',id:60},
+        {name:'B',id:61},
+        {name:'N',id:62},
+        {name:'M',id:63},
+        // {name:'←',id:99},
+      ],
+      plate_number: '',   //车牌号
+      first:'',
+      numArr:[],
     }
   },
   methods: {
+    // 唤起键盘
+    clickShowKeyboard(){
+      if(!this.first){
+        this.show_chinese = true;
+      }else{
+        this.show_chinese = false;
+        this.show_allBoard = true;
+      }
+    },
+    deleteChinese() {
+      // 点击跳转到数字字母
+      this.show_chinese = false;
+      this.show_allBoard = true;
+    },
+    // 选择车牌号前面的汉字 
+    checkChinese(index){
+        // 把选中的字赋值给第一个格，并且切换键盘
+      this.first = this.ChineseList[index].name;
+      this.show_chinese = false;
+      this.show_allBoard = true;
+    },
+    // 删除键
+    onDelete() {
+      // 如果点击删除键，删除 numArr 的最后一个值
+      this.numArr.pop()
+      // 如果 numArr 里面被删的没有值了，切换键盘
+      if(this.numArr.length == 0){
+        this.show_chinese = true;
+        this.show_allBoard = false;
+      }
+    },
+    // 选择车牌号后面的数字和字母 
+    checkEnglish_num(index){
+      // 把选中的值 push 到 numArr 内
+      this.numArr.push(this.English_Number[index].name)
+      // 如果 numArr 中的值超过 7 个（车牌号的最大位数），删除最后一个
+      if(this.numArr.length > 6){
+        this.numArr.pop()
+      }
+    },
+    // 关闭虚拟键盘
+    close_keyboard(){
+      this.show_chinese = false;
+      this.show_allBoard = false;
+    },
     // 获取cookie
     getCookie(name){
       let arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
@@ -105,8 +244,9 @@ export default {
         } catch (error) {
         }
         _this.car_data = _this.result.datas;
-        _this.value1 = _this.result.datas.asv_vehicle_plate_number.slice(0,1); // 车辆归属地
+        _this.first = _this.result.datas.asv_vehicle_plate_number.slice(0,1); // 车辆归属地
         _this.asv_vehicle_plate_number = _this.result.datas.asv_vehicle_plate_number.slice(1); // 车牌号
+        _this.numArr = _this.asv_vehicle_plate_number.split("");
         if (_this.result.datas.asv_vehicle_owners_type === "1") {
           _this.value2 = '私家车'
         } else {
@@ -220,8 +360,11 @@ export default {
         if (!token) {
           token = this.getCookie('token')
         }
+        if (!token) {
+          this.$router.replace('/asv/login');
+        }
         let value2;
-        let asv_vehicle_plate_number = this.value1 + this.asv_vehicle_plate_number;
+        let asv_vehicle_plate_number = this.first + this.numArr.join('');
         let is_accident = checked ? 0 : 1;
         if(!this.vehicle_id && !checked){
           if (this.value2 == '私家车') {
@@ -237,8 +380,8 @@ export default {
           } else {
             let addres;
             try {
-              console.log(asv_vehicle_plate_number, value2, this.value3, this.engineMessage, this.vinMessage, this.timeValue, is_accident, token);
-              addres = await reqAddress(asv_vehicle_plate_number, value2, this.value3, this.engineMessage, this.vinMessage, this.timeValue, is_accident, token);
+              // console.log(asv_vehicle_plate_number, value2, this.value3, this.engineMessage, this.vinMessage, this.timeValue, is_accident, token);
+              addres = await reqAddress(asv_vehicle_plate_number, value2, this.value3, this.vinMessage, this.engineMessage, this.timeValue, is_accident, token);
             } catch (error) {
             }
             const vehicle_id = addres.datas.vehicle_id;
@@ -259,17 +402,13 @@ export default {
             value2 = '2';
           }
           try {
-            alterres = await reqAlterCar(this.vehicle_id, asv_vehicle_plate_number, value2, this.value3, this.engineMessage, this.vinMessage, this.timeValue, is_accident, token);
+            alterres = await reqAlterCar(this.vehicle_id, asv_vehicle_plate_number, value2, this.value3, this.vinMessage, this.engineMessage, this.timeValue, is_accident, token);
           } catch (error) {
           }
           if (alterres.msg == 'ok') {
             let vehicle_id = this.vehicle_id;
             Toast.clear;
-            Dialog.alert({
-              message: '保存成功'
-            }).then(() => {
-              this.$router.replace({path: '/asv/index', query: {vehicle_id}})
-            });
+            this.$router.replace({path: '/asv/index', query: {vehicle_id}})
           } else {
             Dialog.alert({
               message: alterres.msg
@@ -297,7 +436,7 @@ export default {
         }
         let res;
         try {
-          console.log(token, this.vehicle_id);
+          // console.log(token, this.vehicle_id);
           res = await removeCar(token, this.vehicle_id)
           if (res.errno == '10000') {
             Toast.success('删除成功');

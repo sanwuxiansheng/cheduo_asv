@@ -42,7 +42,7 @@ export const reqSix = (source = '', vehicle_id, token) => ajax(PHP + `/asv/index
 export const reqWz = (source, vehicle_id, token) => ajax(PHP + `/wz/index`, {source, vehicle_id, token}, 'POST');
 
 // 13. 接车代办创建订单
-export const reqAddOrder = (vcode, vehicle_id, contact_mobile, contact_name, region_code, appointment_datetime, address, source, token) => ajax(PHP + `/api/asv/create_order_deal_by_cheduo`, {vcode, vehicle_id, contact_mobile, contact_name, region_code, appointment_datetime, address, source, token}, 'POST');
+export const reqAddOrder = (vcode, vehicle_id, contact_mobile, contact_name, region_code, appointment_lat = 22.5836023500, appointment_lng = 113.8637316227, appointment_datetime, address, source, token) => ajax(PHP + `/api/asv/create_order_deal_by_cheduo`, {vcode, vehicle_id, contact_mobile, contact_name, region_code, appointment_lat, appointment_lng, appointment_datetime, address, source, token}, 'POST');
 
 // 14. 获取省市县
 export const reqCity = () => ajax(PHP + `/api/normal/city`, {}, 'POST');
@@ -76,3 +76,6 @@ export const reqOrderPay = (order_code, token) => ajax(PHP + `/api/asv/pay_order
 
 // 24. 用户已经办理
 export const saveAsvDate = (vehicle_id, token) => ajax(PHP + `/api/asv/save_asv_date`, {vehicle_id, token}, 'POST');
+
+// 25. 测试token是否过期
+export const reqToken = (token) => ajax(PHP + `/mc_java_api/cheduo/h5/user/forbidden_token`, {token});

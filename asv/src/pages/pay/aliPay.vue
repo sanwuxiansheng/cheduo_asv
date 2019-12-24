@@ -22,11 +22,11 @@
           const alipay = await reqAlipay(order_code, asv_coupon_id, token)
           // console.log(alipay);
           if (typeof alipay === Object) {
-            console.log(alipay)
+            // console.log(alipay)
             // console.log('渲染页面');
             Toast('支付失败')
           } else {
-            console.log(alipay);
+            // console.log(alipay);
             this.html = alipay;
             this.$nextTick(() => {
               document.forms[0].submit()   //渲染支付宝支付页面

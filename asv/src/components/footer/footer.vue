@@ -54,9 +54,9 @@ export default {
     setCookie(name, value) {
       var str = name + "=" + escape(value) + ";domain=m.cheduo.com;path=/html";
       var date = new Date();
-      date.setTime(date.getTime() + 1 * 24 * 60 * 60 * 1000); //设置date为当前时间
+      date.setTime(date.getTime() + 1 * 2 * 60 * 60 * 1000); //设置date为当前时间
       str += ";expires=" + date.toGMTString();
-      console.log(str)
+      // console.log(str)
       document.cookie = str;
     },
     toSix (path) {
@@ -69,7 +69,7 @@ export default {
       }
       const vehicle_id = this.getCookie('vehicle_id');
       let carIndex = this.$store.state.carIndex;
-      const year = this.$store.state.diff_year[carIndex][vehicle_id];
+      const year = this.$store.state.asv_counts[carIndex][vehicle_id];
       const isTrue = this.$store.state.user[carIndex].errno;
       if (token && year < 4.1) {
         const source = 'H5-cheduo';

@@ -71,9 +71,9 @@ export default {
     setCookie(name, value) {
       var str = name + "=" + escape(value) + ";domain=m.cheduo.com;path=/html";
       var date = new Date();
-      date.setTime(date.getTime() + 1 * 24 * 60 * 60 * 1000); //设置date为当前时间加一年
+      date.setTime(date.getTime() + 1 * 2 * 60 * 60 * 1000); //设置date为当前时间加一年
       str += ";expires=" + date.toGMTString();
-      console.log(str)
+      // console.log(str)
       document.cookie = str;
     },
     getCookie(name){

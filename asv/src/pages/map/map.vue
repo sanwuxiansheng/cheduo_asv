@@ -115,6 +115,14 @@ export default {
     this.beforeMount(0)
   },
   methods: {
+    setCookie (name, value) {
+      var str = name + "=" + escape(value) + ";domain=m.cheduo.com;path=/html";
+      var date = new Date();
+      date.setTime(date.getTime() + 1 * 2 * 60 * 60 * 1000); //设置date为当前时间加一年
+      str += ";expires=" + date.toGMTString();
+      // console.log(str)
+      document.cookie = str;
+    },
     beforeMount(height) {
       var h = document.documentElement.clientHeight || document.body.clientHeight;
       this.curHeight =h - height + `px`; //减去页面上固定高度height
@@ -265,8 +273,12 @@ export default {
       eventBus.$emit('city_address',e);
        this.$store.commit(RECEIVE_CITY, e)
       //  // console.log(this.$store.state.address);
-      this.$router.go(-1)
       this.marker.setPosition([e.location.lng, e.location.lat]); //更新标记的位置
+      let lng = e.location.lng;
+      let lat = e.location.lat;
+      this.setCookie('lng', lng)
+      this.setCookie('lat', lat)
+      this.$router.go(-1)
     },
     onSearchLi(e) {
       // console.log(e);

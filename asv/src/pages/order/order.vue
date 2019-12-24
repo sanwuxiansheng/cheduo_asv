@@ -4,15 +4,15 @@
   <PageNotFound v-if="!orderList.length" :title="'暂无订单'"></PageNotFound>
   <div class="order" v-bind:style="{height:curHeight}">
     <ul>
-      <li v-for="(item,index) in orderList" :key="index" @click.stop="goTo('/asv/order_det', index)">
+      <li v-for="(item,index) in orderList" :key="index" @click.stop.prevent="goTo('/asv/order_det', index)">
         <div class="item_up">年检代办
           <span v-if="item.order_status == '4'">处理中</span>
-          <span v-if="item.order_status == '1' && isFloat">待支付</span>
+          <span v-if="item.order_status == '1'">待支付</span>
           <span v-if="item.order_status == '2'">处理中</span>
           <span v-if="item.order_status == '3'">已收款</span>
           <span v-if="item.order_status == '5'">已完成</span>
           <span v-if="item.order_status == '6'">退款中</span>
-          <span v-if="item.order_status == '8' || !isFloat">已取消</span>
+          <span v-if="item.order_status == '8'">已取消</span>
           <span v-if="item.order_status == '7'">已退款</span>
           <!-- <p v-if="item.order_status == '1' && isFloat" style="font-size:12px;font-weight:500;color:rgba(255,134,22,1);display:inline-block;float:right;padding-right:10px;">请在{{timer[index]}}分钟内完成支付</p> -->
         </div>
@@ -28,8 +28,8 @@
         <div class="item_down">
           <span class="text">订单金额</span>
           <span class="money" :class="{active: item.order_status !== '2'}">￥{{item.original_money}}</span>
-          <div class="btn" v-if="item.order_status == '3'" @click.stop="onRefund(index)">申请退款</div>
-          <!-- <div class="btn"  v-if="item.order_status == '1'" @click.stop="onGoPay(index)">去支付</div> -->
+          <div class="btn" v-if="item.order_status == '3'" @click.stop.prevent="onRefund(index)">申请退款</div>
+          <div class="btn"  v-if="item.order_status == '1'" @click.stop.prevent="onGoPay(index)">去支付</div>
         </div>
       </li>
     </ul>
@@ -39,7 +39,7 @@
 <script>
 import Header from '../../components/header/header';
 import PageNotFound from '../../components/404/404';
-import {reqOrderList, reqRefund} from '../../api';
+import {reqOrderList, reqRefund, reqToken} from '../../api';
 import { Toast } from 'vant';
 import BScroll from 'better-scroll';
 export default {
@@ -91,11 +91,28 @@ export default {
     }
   },
   methods: {
-    onGoPay(_index) { // 订单为待支付状态时去支付
+    async onGoPay(_index) { // 订单为待支付状态时去支付
       const order = this.orderList[_index]
       const order_code = order.order_code;
-      console.log(order_code);
-      this.$router.replace({path: '/paydir/asv-pay', query: {order_code}})
+      let token = this.getCookie('token')
+      try {
+        let res = await reqToken(token)
+        if (res.errno == '10000'){
+          if (this.$store.state.isWX) {
+            let payUrl = `https://m.cheduo.com/html/paydir/asv-pay?order_code=${order_code}&token=${token}`;
+            let wxUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxa9bc2c68483cb54c&redirect_uri="+payUrl+"&response_type=code&scope=snsapi_base&state=STATE&connect_redirect=1#wechat_redirect"
+            window.location.href = wxUrl;
+          } else {
+            this.$router.replace({path: '/paydir/asv-pay', query: {order_code}})
+          }
+        } else {
+          this.$router.replace('/asv/login')
+        }
+      } catch (error) {
+        alert(error)
+        // console.log(error);
+      }
+      
     },
     beforeMount(height) {
       var h = document.documentElement.clientHeight || document.body.clientHeight;
@@ -145,11 +162,11 @@ export default {
       const type = '3';
       let res;
       try {
-        console.log(order_code, type, token);
+        // console.log(order_code, type, token);
         res = await reqRefund(order_code, type, token);
-        console.log(res);
+        // console.log(res);
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       }
       if (res.errno == '10000') {
         Toast('申请退款中')
@@ -289,12 +306,12 @@ export default {
           flex 5
         .btn
           flex 2
-          width:168px;
-          height:56px;
+          width:188px;
+          height:76px;
           background:rgba(39,130,244,1);
           border-radius:28px;
           color #ffffff
           font-size:26px;
-          line-height 56px
+          line-height 76px
           text-align center
 </style>

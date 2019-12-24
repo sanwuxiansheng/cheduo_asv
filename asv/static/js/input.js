@@ -5,7 +5,7 @@ export default function input_on() {
       // Document 对象的activeElement 属性返回文档中当前获得焦点的元素。
       if (document.activeElement.id === 'INPUT') {
         // alert(document.activeElement.getElementsByClassName)
-        console.log('安卓触发', document.activeElement.className)
+        // console.log('安卓触发', document.activeElement.className)
         window.setTimeout(function() {
           document.activeElement.scrollIntoView({
             behavior:'instant',

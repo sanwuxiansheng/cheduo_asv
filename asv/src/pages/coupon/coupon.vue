@@ -1,12 +1,12 @@
 <template>
 <div>
-  <Header :title="'优惠券'"></Header>
+  <HeaderFore :title="'优惠券'"></HeaderFore>
   <div class="coupon" v-bind:style="{height:curHeight}">
-    <div class="inner" v-if="datas == []">
+    <div class="inner" v-if="isNo">
       <img src="./img/no_coupon.png" alt="">
       <p>空空如也</p>
     </div>
-    <div class="center">
+    <div class="center" v-if="!isNo">
       <ul class="center_list">
         <li class="center_item"  v-for="(item, index) in datas" :key="index">
           <div class="item_left">
@@ -19,7 +19,7 @@
             <p class="down">{{item.start_expire_time | formatDate}}-{{item.expire_time | formatDate}}</p>
           </div>
           <div class="item_right" v-show="isShow">
-            <button @click="onSelect(item)">选择</button>
+            <button @click="onSelect(item, index)">选择</button>
           </div>
         </li>
         <!-- <li class="center_item">
@@ -42,20 +42,21 @@
 </div>
 </template>
 <script>
-import Header from '../../components/header/header';
+import HeaderFore from '../../components/header/header_fore.vue';
 import {reqCoupon} from '../../api';
 import BScroll from 'better-scroll';
 import {Dialog} from 'vant';
 export default {
   name: 'coupon',
   component:{
-    Header
+    HeaderFore
   },
   data () {
     return {
       curHeight:0,//当前所需屏幕高度  
-      datas: {}, // 请求回来的优惠卷数据
+      datas: [], // 请求回来的优惠卷数据
       isShow: false, // 是否显示选择按钮
+      isNo: false,
     }
   },
   filters: {
@@ -76,17 +77,18 @@ export default {
       var h = document.documentElement.clientHeight || document.body.clientHeight;
       this.curHeight =h - height + `px`; //减去页面上固定高度height
     },
-    onSelect(item) { // 选择优惠卷
+    onSelect(item, index) { // 选择优惠卷
       let couponId = item.id;
       let token = this.getCookie('token')
       this.setCookie('couponId', couponId)
+      this.setCookie('couponIndex', index)
       // if (this.$store.state.isWX) {
         // let payUrl = `https://m.cheduo.com/html/paydir/asv-pay?order_code=${order_code}&token=${token}`;
         // let wxUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxa9bc2c68483cb54c&redirect_uri="+payUrl+"&response_type=code&scope=snsapi_base&state=STATE&connect_redirect=1#wechat_redirect"
         // window.location.href = wxUrl;
         // console.log(wxUrl);
       // }else {
-        this.$router.go(-1)
+      this.$router.go(-1)
       // }
     },
     getCookie(name){
@@ -100,9 +102,9 @@ export default {
     setCookie(name, value) {
       var str = name + "=" + escape(value) + ";domain=m.cheduo.com;path=/html";
       var date = new Date();
-      date.setTime(date.getTime() + 1 * 24 * 60 * 60 * 1000); //设置date为当前时间
+      date.setTime(date.getTime() + 1 * 2 * 60 * 60 * 1000); //设置date为当前时间
       str += ";expires=" + date.toGMTString();
-      console.log(str)
+      // console.log(str)
       document.cookie = str;
     },
   },
@@ -150,10 +152,17 @@ export default {
       const result = await reqCoupon(token);
       if (result.errno == '10000') {
         this.datas = result.datas;
+        if (this.datas.length == 0) {
+          this.datas = []
+          this.isNo = true;
+        } else {
+          this.isNo = false;
+        }
       } else {
-        this.datas = []
+        this.datas = [];
+        this.isNo = true;
       }
-      console.log(result);
+      // console.log(result);
     }
   }
 }

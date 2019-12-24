@@ -19,7 +19,8 @@
         <div class="item" @click="goCoupon()">
           <span>选择优惠券</span>
           <p v-if="this.resData.coupon_num == '0'" class="item_pp">暂无可用优惠券 <i><img src="../manage/img/right.png" alt=""></i></p>
-          <p v-if="this.resData.coupon_num !== '0'" class="item_pp">可用优惠券数量{{this.resData.coupon_num}}张 <i><img src="../manage/img/right.png" alt=""></i></p>
+          <p v-if="(this.resData.coupon_num != '0' && couponIndex == null)" class="item_pp">可用优惠券数量{{this.resData.coupon_num}}张 <i><img src="../manage/img/right.png" alt=""></i></p>
+          <p v-if="(this.resData.coupon_num != '0' && couponIndex != null)" class="item_pp">{{this.coupon[couponIndex].note}}<i><img src="../manage/img/right.png" alt=""></i></p>
         </div>
       </div>
       <div class="center_item">
@@ -80,6 +81,7 @@ export default {
       resData:{},
       coupon:[], // 年检优惠卷数组
       code:null,
+      couponIndex: null,
     }
   },
   mounted () {
@@ -89,19 +91,18 @@ export default {
       this.order_code = Number(this.getUrlParam('order_code'));
     }
     this.code = this.getUrlParam('code');
-    console.log(this.order_code, this.code);
+    // console.log(this.order_code, this.code);
     this.token = this.$store.state.token;
     if (!this.token) {
-      console.log(this.token);
       this.token = this.getCookie('token');
       if (!this.token) {
-        console.log(this.token);
         this.token = this.getUrlParam('token');
         this.setCookie('token', this.token)
       }
     }
     this.orderPay(this.order_code);
-    // this.onReqCoupon();
+    this.onReqCoupon();
+    this.couponIndex = this.getCookie('couponIndex')
   },
   methods: {
     goCoupon() { // 选择优惠卷函数
@@ -116,9 +117,9 @@ export default {
     setCookie(name, value) {
       var str = name + "=" + escape(value) + ";domain=m.cheduo.com;path=/html";
       var date = new Date();
-      date.setTime(date.getTime() + 1 * 24 * 60 * 60 * 1000); //设置date为当前时间加一年
+      date.setTime(date.getTime() + 1 * 2 * 60 * 60 * 1000); //设置date为当前时间加一年
       str += ";expires=" + date.toGMTString();
-      console.log(str)
+      // console.log(str)
       document.cookie = str;
     },
     getUrlParam(paramname) {
@@ -137,7 +138,7 @@ export default {
         res = await reqOrderPay(order_code, token);
         this.resData = res.datas;
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       }
     },
     async onPay() {
@@ -157,9 +158,9 @@ export default {
         try {
           result = await reqWxopenID(this.code)
           appID = result.datas.openid;
-          console.log(result, appID);
+          // console.log(result, appID);
         } catch (error) {
-          console.log(error);
+          // console.log(error);
         }
         const inwx = await reqInwechat(this.order_code, appID, asv_coupon_id, this.token);
         if (inwx.status === 1) {
@@ -272,11 +273,7 @@ export default {
       try {
         res = await reqCoupon(this.token)
       } catch (error) {
-        console.log(error);
-        Toast({
-          message: '请求出错了',
-          forbidClick: true
-        })
+        // console.log(error);
       }
       if (res) {
         this.coupon = res.datas;
@@ -285,7 +282,7 @@ export default {
   },
   updated () {
     this.isWX = this.$store.state.isWX;
-    console.log(this.getCookie('token'),this.$store.state.token);
+    // console.log(this.getCookie('token'),this.$store.state.token);
     this.token = this.getCookie('token')
   }
 }
@@ -361,7 +358,7 @@ export default {
             top 35px
             left -10px
         .item_pp
-          margin-left 230px
+          margin-left 200px
           display: inline-flex;
           i 
             width:12px;

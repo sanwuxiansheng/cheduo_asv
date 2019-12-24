@@ -104,7 +104,7 @@ export default {
       let time = parseInt(value);
       time = time*1000;
       let date = new Date(time);
-      console.log(time, date);
+      // console.log(time, date);
       let y = date.getFullYear();
       let MM = date.getMonth() + 1;
       MM = MM < 10 ? ('0' + MM) : MM;

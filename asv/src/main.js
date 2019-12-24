@@ -10,12 +10,13 @@ import 'element-ui/lib/theme-chalk/index.css';
 import element from './element/index';
 import { Steps, Step } from 'element-ui';
 import moment from 'moment'; // 格式化时间
-import { DatetimePicker, Popup, Cell, RadioGroup, Radio, CellGroup, Field, SwitchCell, Toast, PasswordInput, NumberKeyboard } from 'vant';
+import { DatetimePicker, Popup, Cell, RadioGroup, Radio, CellGroup, Field, SwitchCell, Toast, PasswordInput, NumberKeyboard, Button } from 'vant';
 import '@vant/touch-emulator';
 // 定义全局组件
 import Header from './components/header/header.vue';
 import HeaderTwo from './components/header/header_two.vue';
 import HeaderThree from './components/header/header_three.vue';
+import HeaderFore from './components/header/header_fore.vue';
 import Footer from './components/footer/footer.vue';
 import PageNotFound from './components/404/404.vue';
 import AMap from 'vue-amap';
@@ -33,11 +34,13 @@ Vue.use(Distpicker);
 Vue.use(CellGroup);
 Vue.use(Toast);
 Vue.use(Field);
+Vue.use(Button);
 Vue.use(SwitchCell);
 Vue.component('Header', Header);
 Vue.component('Footer', Footer);
 Vue.component('HeaderTwo', HeaderTwo);
 Vue.component('HeaderThree', HeaderThree);
+Vue.component('HeaderFore', HeaderFore);
 Vue.component('PageNotFound', PageNotFound);
 Vue.config.productionTip = false;
 Vue.use(VueAwesomeSwiper);

@@ -3,7 +3,7 @@
   <div class="instation">
     <div class="material">
       <div class="material_header">
-        <img src="../img/tittle_line.png" alt="" class="heder_left">
+        <img src="../img/tittle_line_left.png" alt="" class="heder_left">
         <p>年检所需资料</p>
         <img src="../img/tittle_line.png" alt="" class="heder_right">
       </div>
@@ -27,7 +27,7 @@
     </div>
     <div class="condition">
       <div class="condition_header">
-        <img src="../img/tittle_line.png" alt="" class="heder_left">
+        <img src="../img/tittle_line_left.png" alt="" class="heder_left">
         <p>年检办理条件</p>
         <img src="../img/tittle_line.png" alt="" class="heder_right">
       </div>
@@ -41,7 +41,7 @@
     </div>
     <div class="flow">
       <div class="flow_header">
-        <img src="../img/tittle_line.png" alt="" class="heder_left">
+        <img src="../img/tittle_line_left.png" alt="" class="heder_left">
         <p>年检办理流程</p>
         <img src="../img/tittle_line.png" alt="" class="heder_right">
       </div>
@@ -91,7 +91,7 @@
     </div>
     <div class="harm">
       <div class="harm_header">
-        <img src="../img/tittle_line.png" alt="" class="heder_left">
+        <img src="../img/tittle_line_left.png" alt="" class="heder_left">
         <p>年检逾期危害</p>
         <img src="../img/tittle_line.png" alt="" class="heder_right">
       </div>
@@ -150,8 +150,8 @@ export default {}
         width:171px;
         height:27px;
         line-height:30px;
-      .heder_left
-        transform rotateY(180deg)
+      // .heder_left
+      //   transform rotateY(180deg)
     .material_center
       padding 0 50px
       display flex
@@ -223,8 +223,8 @@ export default {}
         width:171px;
         height:27px;
         line-height:30px;
-      .heder_left
-        transform rotateY(180deg)
+      // .heder_left
+      //   transform rotateY(180deg)
     .condition_center
       width:514px;
       height:265px;
@@ -260,8 +260,8 @@ export default {}
         width:171px;
         height:27px;
         line-height:30px;
-      .heder_left
-        transform rotateY(180deg)
+      // .heder_left
+      //   transform rotateY(180deg)
     .flow_center
       padding 10px 50px
       width 100%
@@ -283,6 +283,7 @@ export default {}
             width 75%
             text-align left
             padding-left 20px
+            padding-top 5px
             p
               width:113px;
               height:27px;
@@ -326,8 +327,8 @@ export default {}
         width:171px;
         height:27px;
         line-height:30px;
-      .heder_left
-        transform rotateY(180deg)
+      // .heder_left
+      //   transform rotateY(180deg)
     .harm_center
       padding 0 50px
       display flex

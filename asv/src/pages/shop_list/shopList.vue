@@ -100,7 +100,18 @@ export default {
     },
     upCallback (page, mescroll) {
       // console.log(page, mescroll);
-      const url = `/php/api/asv/shop`;
+      const url = `https://m.cheduo.com/api/asv/shop`;
+      const province_code = this.selected[0];
+      const city_code = this.selected[1];
+      let area_code;
+      for(var st in this.selected[2]) {
+        area_code = st;
+      }
+      let token = this.$store.state.token;
+      if (!token) {
+        token = this.getCookie('token')
+      }
+      this.reqData = {province_code, city_code, token, area_code};
       axios({
         method:"post",
         url,
@@ -115,10 +126,6 @@ export default {
             }
             return ret
         }],
-        params: {
-          num: page.num, // 页码
-          size: page.size // 每页长度
-        }
       }).then((response) => {
         // 请求的列表数据
         let arr = response.data.datas;

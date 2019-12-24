@@ -17,7 +17,7 @@ export default {
   // 用户选择index
   index: null,
   // 用户车辆注册年限数组
-  diff_year: [],
+  asv_counts: [],
   // 当前车辆的index
   carIndex: null,
   // 用户选择的详细地址

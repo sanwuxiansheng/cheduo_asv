@@ -47,10 +47,6 @@
         <input type="text" value="" placeholder="请填写验证码" v-model="vcode"  id="INPUT" maxlength="6">
         <span @click="sendCode()">{{content}}</span>
       </div>
-      <!-- <div class="remark">
-        <p>备注</p>
-        <input type="text" value="" placeholder=""  v-model="remark" id='INPUT'>
-      </div> -->
     </div>
     <ul class="list">
       <li class="item">
@@ -70,7 +66,7 @@
 import Header from '../../components/header/header';
 import AreaList from '../../../static/js/area.js';
 import { DatetimePicker, Popup, Cell, Button, Field, Dialog, Toast, Area } from 'vant';
-import {reqSendCode, reqWz, reqAddOrder, reqCity, reqSites} from '../../api';
+import {reqSendCode, reqWz, reqAddOrder, reqCity, reqSites, reqToken} from '../../api';
 import {RECEIVE_ORDERS} from '../../store/mutation-types';
 import eventBus from '../../event/eventBus.js';
 import input_on from '../../../static/js/input.js';
@@ -99,7 +95,7 @@ export default {
       isSite: false, // 是否展示省市区组件
       areaList: AreaList,
       city: '广东省 深圳市 宝安区',
-      region_code: '440300',
+      region_code: '440306',
       address: '', // 详细地址
       result: {}, // 创建订单返回的对象
       content:'发送验证码',
@@ -120,6 +116,14 @@ export default {
           theRequest[ strs[ i ].split( "=" )[ 0 ] ] = ( strs[ i ].split( "=" )[ 1 ] ); 
         }
       }
+    },
+    setCookie (name, value) {
+      var str = name + "=" + escape(value) + ";domain=m.cheduo.com;path=/html";
+      var date = new Date();
+      date.setTime(date.getTime() + 1 * 2 * 60 * 60 * 1000); //设置date为当前时间加一年
+      str += ";expires=" + date.toGMTString();
+      // console.log(str)
+      document.cookie = str;
     },
     calculagraph() { // 倒计时函数
       // console.log(this.totalTime);
@@ -147,13 +151,14 @@ export default {
     Onconfirm(e) { // 选择省市区确定事件
       let cityName = '';
       cityName = e[0].name + e[1].name + e[2].name;
-      this.region_code = e[1].code;
+      this.region_code = e[2].code;
+      this.setCookie('region_code', this.region_code)
       // console.log(cityName);
       this.city = cityName;
       this.isSite = false;
     },
     Oncancel() { // 选择省市区取消事件
-      this.region_code = '440300';
+      this.region_code = '440306';
       this.isSite = false;
     },
     site() {
@@ -171,10 +176,13 @@ export default {
             confirmButtonText: '处理违章',
             confirmButtonColor: '#2782F4FF',
             confirm: function() {
+              // alert('111')
               // const res = await reqWz(source, vehicle_id, token)
-              window.location.href = "https://m.cheduo.com/wz/index?source="+source+'&vehicle_id='+vehicle_id+'&token='+token;
+              
             }
           }).then(() => {
+            // alert('222')
+            window.location.href = "https://m.cheduo.com/wz/index?source="+source+'&vehicle_id='+vehicle_id+'&token='+token;
             // on close
           });
         } else if (!this.userName && !this.mobile && !this.vcode) {
@@ -220,70 +228,90 @@ export default {
       if (!token) {
         token = this.getCookie('token');
       }
-      let source = this.getCookie('source');
-      if (!source) {
-        source = 'H5-cheduo'
-      }
-      if (!this.userName && !this.mobile && !this.vcode) {
-        Dialog.alert({
-          title: '温馨提示',
-          message: '信息不完整，请填写完整信息',
-          messageAlign: 'left',
-          width: '80%',
-          closeOnClickOverlay: 'true',
-          confirmButtonText: '确定',
-          confirmButtonColor: '#2782F4FF'
-        }).then(() => {
-          // on close
-        });
-        return false;
-      }
-      let result;
       try {
-        result = await reqAddOrder(this.vcode, vehicle_id, this.mobile, this.userName, this.region_code, this.timeValue, this.address, source, token);
-        // console.log(result);
+        let res = await reqToken(token)
+        if (res.errno != '10000') {
+          Toast('登录超时，请重新登录')
+          this.$router.replace('/asv/login')
+        } else {
+          let source = this.getCookie('source');
+          if (!source) {
+            source = 'H5-cheduo'
+          }
+          let appointment_lat = this.getCookie('lat');
+          let appointment_lng = this.getCookie('lng');
+          if (!appointment_lat || !appointment_lng) {
+            appointment_lng = 113.8637316227;
+            appointment_lat = 22.5836023500;
+          }
+          if (!this.userName && !this.mobile && !this.vcode && !this.timeValue) {
+            Dialog.alert({
+              title: '温馨提示',
+              message: '信息不完整，请填写完整信息',
+              messageAlign: 'left',
+              width: '80%',
+              closeOnClickOverlay: 'true',
+              confirmButtonText: '确定',
+              confirmButtonColor: '#2782F4FF'
+            }).then(() => {
+              // on close
+            });
+            return false;
+          }
+          let result;
+          try {
+            result = await reqAddOrder(this.vcode, vehicle_id, this.mobile, this.userName, this.region_code, appointment_lat, appointment_lng, this.timeValue, this.address, source, token);
+            // console.log(result);
+          } catch (error) {
+            // console.log(error);
+          }
+          this.result = result;
+          if (this.result.datas.wz && this.result.errno == "10000") {
+            Dialog.alert({
+              title: '温馨提示',
+              message: '系统查询到您的车辆存在违章未处理 情况，请先处理好违章，否则年检将 无法办理',
+              messageAlign: 'left',
+              width: '80%',
+              closeOnClickOverlay: 'true',
+              confirmButtonText: '处理违章',
+              confirmButtonColor: '#2782F4FF',
+              confirm: function() {
+                // alert(111)
+                // const res = await reqWz(source, vehicle_id, token)
+                
+              }
+            }).then(() => {
+              // alert(222)
+              window.location.href = "https://m.cheduo.com/wz/index?source="+source+'&vehicle_id='+vehicle_id+'&token='+token;
+              // on close
+            });
+          }else if (this.result.errno == '10000') {
+            const order_code = this.result.datas.order_code;
+            Toast.clear();
+            // this.getCode()
+            if (this.$store.state.isWX) {
+              let payUrl = `https://m.cheduo.com/html/paydir/asv-pay?order_code=${order_code}&token=${token}`;
+              let wxUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxa9bc2c68483cb54c&redirect_uri="+payUrl+"&response_type=code&scope=snsapi_base&state=STATE&connect_redirect=1#wechat_redirect"
+              window.location.href = wxUrl;
+              // console.log(wxUrl);
+            }else {
+              this.$router.push({ path: '/paydir/asv-pay', query: { order_code } })
+            }
+            const orders = this.$store.state.orders.push(order_code);
+            this.$store.commit('RECEIVE_ORDERS', orders);
+            // console.log(this.$store.state.orders);
+          } else if (this.result.errno != '10000') {
+            // console.log(this.result);
+            Toast({
+              message: this.result.msg,
+              forbidClick: true
+            });
+          }
+        }
       } catch (error) {
         // console.log(error);
       }
-      this.result = result;
-      if (this.result.datas.wz && this.result.errno == "10000") {
-        Dialog.alert({
-          title: '温馨提示',
-          message: '系统查询到您的车辆存在违章未处理 情况，请先处理好违章，否则年检将 无法办理',
-          messageAlign: 'left',
-          width: '80%',
-          closeOnClickOverlay: 'true',
-          confirmButtonText: '处理违章',
-          confirmButtonColor: '#2782F4FF',
-          confirm: function() {
-            // const res = await reqWz(source, vehicle_id, token)
-            window.location.href = "http://192.168.1.12:82/wz/index?source="+source+'&vehicle_id='+vehicle_id+'&token='+token;
-          }
-        }).then(() => {
-          // on close
-        });
-      }else if (this.result.errno == '10000') {
-        const order_code = this.result.datas.order_code;
-        Toast.clear();
-        // this.getCode()
-        if (this.$store.state.isWX) {
-          let payUrl = `https://m.cheduo.com/html/paydir/asv-pay?order_code=${order_code}&token=${token}`;
-          let wxUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxa9bc2c68483cb54c&redirect_uri="+payUrl+"&response_type=code&scope=snsapi_base&state=STATE&connect_redirect=1#wechat_redirect"
-          window.location.href = wxUrl;
-          console.log(wxUrl);
-        }else {
-          this.$router.push({ path: '/paydir/asv-pay', query: { order_code } })
-        }
-        const orders = this.$store.state.orders.push(order_code);
-        this.$store.commit('RECEIVE_ORDERS', orders);
-        // console.log(this.$store.state.orders);
-      } else if (this.result.errno != '10000') {
-        // console.log(this.result);
-        Toast({
-          message: this.result.msg,
-          forbidClick: true
-        });
-      }
+      
     },
     getCookie(name) {
       var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
@@ -304,6 +332,7 @@ export default {
     },
     confirmFn() { // 确定时间按钮
       this.timeValue = this.timeFormat(this.currentDate);
+      this.setCookie('timeValue', this.timeValue)
       this.show = false;
     },
     cancelFn(){ // 取消时间按钮
@@ -327,12 +356,12 @@ export default {
     async sendCode() {
       let text = this.content;
       let result;
-      console.log(this.mobile);
+      // console.log(this.mobile);
       if (text == '发送验证码' && this.mobile) {
-        console.log(this.mobile);
+        // console.log(this.mobile);
         result = await reqSendCode(this.mobile);
         Toast(result.msg)
-        console.log(result);
+        // console.log(result);
         this.calculagraph()
         if (result && result.errno == '10000') {
           Toast(result.msg)
@@ -349,6 +378,14 @@ export default {
     this.timeFormat(new Date());
     if (this.$store.state.address) {
       this.address = this.$store.state.address.address;
+    }
+    let timeValue = this.getCookie('timeValue');
+    if (timeValue) {
+      this.timeValue = timeValue;
+    }
+    let code = this.getCookie('region_code');
+    if (coed) {
+      this.region_code = code;
     }
   },
   computed: {
@@ -440,7 +477,7 @@ export default {
         input 
           width:570px;
           height:60px;
-          font-size:28px;
+          font-size:24px;
           font-weight:500;
           color:#08101a;
           line-height:82px;
@@ -456,7 +493,7 @@ export default {
           height 44px
   .message
     width:100%;
-    height:333px;
+    height:250.5px;
     background:rgba(255,255,255,1);
     margin-top 22px
     .name
@@ -468,7 +505,9 @@ export default {
         width 60%
         background-color rgba(254,254,254,1)
         margin-left 50px
-        height .6rem
+        height .65rem
+        font-size 24px
+        font-weight:500;
         &::-webkit-input-placeholder 
           font-size: 24px;
       p
@@ -490,7 +529,9 @@ export default {
         width 60%
         background-color rgba(254,254,254,1)
         margin-left 50px
-        height .6rem
+        height .65rem
+        font-size 24px
+        font-weight:500;
         &::-webkit-input-placeholder 
           font-size: 24px;
       p
@@ -512,7 +553,9 @@ export default {
         width 43%
         background-color rgba(254,254,254,1)
         padding-left 48px
-        height .6rem
+        height .65rem
+        font-size 24px
+        font-weight:500;
         &::-webkit-input-placeholder 
           font-size: 24px;
       p
@@ -532,35 +575,14 @@ export default {
         font-weight:500;
         color:rgba(231,141,0,1);
         line-height:29px;
-    // .remark
-    //   bottom-border-1px(#e4e4e4)
-    //   width:100%;
-    //   height:82.5px;
-    //   background:rgba(254,254,254,1);
-    //   input
-    //     width 60%
-    //     background-color rgba(254,254,254,1)
-    //     margin-left 50px
-    //     height .6rem
-    //     &::-webkit-input-placeholder 
-    //       font-size: 24px;
-    //   p
-    //     width:121px;
-    //     height:28px;
-    //     font-size:30px;
-    //     font-weight:500;
-    //     color:rgba(8,16,26,1);
-    //     line-height:82.5px;
-    //     margin-left 20px
-    //     display inline-block
-    //     text-align left
+    
   .list 
     width 100%
     box-sizing:border-box
-    padding 10px 30px
+    padding 5px 30px
     .item
       display flex
-      margin 50px auto
+      margin 20px auto
       text-align left 
       img 
         display inline-block
@@ -577,7 +599,7 @@ export default {
           color rgba(231, 141, 0, 1)
   .button
     position absolute
-    bottom -100px
+    bottom -65px
     width:680px;
     left 50%
     transform translate(-50%)

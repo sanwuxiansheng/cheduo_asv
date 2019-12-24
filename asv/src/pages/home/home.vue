@@ -9,7 +9,7 @@
           <li class="item swiper-slide swiper-slide-next" v-for="(item, index) in user_data" :key="index">
             <div class="item-top">
               <p>{{item.asv_vehicle_plate_number}}</p>
-              <span>免上线</span>
+              <span v-show="onLine">免上线</span>
               <p>注册日期：{{item.asv_vehicle_register_date}}</p>
               <a class="top-button" @click="goTo('/asv/compile', item.vehicle_id)"><i></i>编辑</a>
             </div>
@@ -94,8 +94,9 @@ export default {
       yuqi: false, // 车辆是否逾期
       cars:[],
       carsDay:[],
-      diff_year:6, // 车辆注册年数
+      asv_counts:6, // 车辆注册年数
       index:null,
+      onLine: true
     }
   },
   component:{
@@ -154,9 +155,9 @@ export default {
             const setCookie = function(name, value) {
               var str = name + "=" + escape(value) + ";domain=m.cheduo.com;path=/html";
               var date = new Date();
-              date.setTime(date.getTime() + 1 * 24 * 60 * 60 * 1000); //设置date为当前时间加一年
+              date.setTime(date.getTime() + 1 * 2 * 60 * 60 * 1000); //设置date为当前时间加一年
               str += ";expires=" + date.toGMTString();
-              console.log(str)
+              // console.log(str)
               document.cookie = str;
             };
             let token = _this.$store.state.token;
@@ -176,15 +177,20 @@ export default {
                 vehicle_id = _this.user_data[0].vehicle_id;
                 setCookie('vehicle_id', vehicle_id);
               }
-              let diff_year = _this.diff_year;
+              let asv_counts = _this.asv_counts;
               let index;
               if (_this.user_data && _this.user_data.length != 0) {
-                _this.diff_year = _this.user_data[this.activeIndex].diff_year;
+                _this.asv_counts = _this.user_data[this.activeIndex].asv_counts;
+                if (_this.asv_counts <= 2) {
+                  _this.onLine = true;
+                } else {
+                  _this.onLine = false;
+                }
                 _this.index = this.activeIndex;
                 index = _this.index;
                 _this.$store.commit(RECEIVE_INDEX, index);
                 if (vehicle_id) {
-                  _this.$store.state.diff_year.splice(index,0,{[vehicle_id]:diff_year})
+                  _this.$store.state.asv_counts.splice(index,0,{[vehicle_id]:asv_counts})
                 }
                 _this.$store.commit(RECEIVE_CARINDEX, index)
               }
@@ -202,13 +208,13 @@ export default {
             const setCookie = function(name, value) {
               var str = name + "=" + escape(value) + ";domain=m.cheduo.com;path=/html";
               var date = new Date();
-              date.setTime(date.getTime() + 1 * 24 * 60 * 60 * 1000); //设置date为当前时间加一年
+              date.setTime(date.getTime() + 1 * 2 * 60 * 60 * 1000); //设置date为当前时间加一年
               str += ";expires=" + date.toGMTString();
-              console.log(str)
+              // console.log(str)
               document.cookie = str;
             };
             const token = getCookie('token');
-            let diff_year = _this.diff_year;
+            let asv_counts = _this.asv_counts;
             if (token) {
               const result = await reqAnnualCar(token);
               _this.user_data = result.datas;
@@ -221,8 +227,13 @@ export default {
               const index = this.activeIndex;
               _this.index = index;
               if (vehicle_id) {
-                _this.diff_year = _this.user_data[this.activeIndex].diff_year;
-                _this.$store.state.diff_year.splice(index,0,{[vehicle_id]:diff_year})
+                _this.asv_counts = _this.user_data[this.activeIndex].asv_counts;
+                if (_this.asv_counts <= 2) {
+                  _this.onLine = true;
+                } else {
+                  _this.onLine = false;
+                }
+                _this.$store.state.asv_counts.splice(index,0,{[vehicle_id]:asv_counts})
                 _this.$store.state.carIndex = index;
               }
               _this.$store.commit(RECEIVE_CARINDEX, index)
@@ -295,7 +306,7 @@ export default {
           Toast(result.msg)
         }
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       }
     },
     goTo (path,data) {
@@ -311,9 +322,9 @@ export default {
     setCookie (name, value) {
       var str = name + "=" + escape(value) + ";domain=m.cheduo.com;path=/html";
       var date = new Date();
-      date.setTime(date.getTime() + 1 * 24 * 60 * 60 * 1000); //设置date为当前时间加一年
+      date.setTime(date.getTime() + 1 * 2 * 60 * 60 * 1000); //设置date为当前时间加一年
       str += ";expires=" + date.toGMTString();
-      console.log(str)
+      // console.log(str)
       document.cookie = str;
     },
     yuqiFn(asv_day) {
@@ -356,20 +367,26 @@ export default {
       if (this.index !== null) {
         carIndex = this.index
         if (carIndex !== null) {
-          year = this.user_data[carIndex].diff_year;
+          year = this.user_data[carIndex].asv_counts;
           isTrue = this.user_data[carIndex].errno;
         }
       }
       
-      if (token && year < 4.1 && isTrue == 1) {
+      if (token && year <= 2 && isTrue == 1) {
         const source = 'H5-cheduo';
+        this.onLine = true;
         // const result = await reqSix(source, vehicle_id, token);
         window.location.href = "https://m.cheduo.com/asv/index?source="+source+'&vehicle_id='+vehicle_id+'&token='+token;
-      } else if (token && year >= 4.1 && isTrue == 1) {
+      } else if (token && year > 2 && isTrue == 1) {
+        this.onLine = false
         this.$router.push(path);
-      } else if (!this.user_data) {
-        Toast('请先添加车辆')
-      } else {
+      } else if (!this.user_data.length) {
+        if (token) {
+          Toast('请先添加车辆')
+        } else {
+          Toast('请您先登录')
+        }
+      } else if(this.user_data.length) {
         Toast('车辆不可办理')
       }
     }
@@ -396,7 +413,7 @@ export default {
     }
     // console.log(this.activeIndex);
     // if (token) {
-      // if (_this.diff_year >= 4 || !_this.diff_year) {
+      // if (_this.asv_counts >= 4 || !_this.asv_counts) {
       //   _this.$router.push({ path: '/asv/pickcar', query: { index } });
       // } else {
       //   _this.$router.push({ path: '/asv/index', query: { index } });
@@ -541,18 +558,18 @@ export default {
                   line-height:30px;
               a 
                 width:171px;
-                height:27px;
+                height:100px;
                 font-size:28px;
                 font-weight:bold;
-                line-height:30px;
+                line-height:120px;
                 color:rgba(39,130,244,1);
                 position absolute
                 &:nth-of-type(1)
                   left 38px
-                  bottom 33px
+                  bottom 20px
                 &:nth-of-type(2)
                   left 420px
-                  bottom 34px
+                  bottom 20px
             .noactive
               background url('./img/cannothandle.png')
               background-repeat no-repeat;
